@@ -10,7 +10,7 @@
                 <img src="../assets/img/edit.svg" alt="">
                 <span>РЕДАКТИРОВАТЬ</span>
             </button>
-            <button class="card__btn card__btn_red">
+            <button @click="$emit('delNote')" class="card__btn card__btn_red">
                 <img src="../assets/img/delete.svg" alt="">
                 <span>Удалить</span>
             </button>

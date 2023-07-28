@@ -1,8 +1,8 @@
 <template>
   <div>
     <Navbar></Navbar>
-    <Notes :notes="notes"/>
-    <Modal v-show="modalOpen" @closeModal="closeModal"/>
+    <Notes :notes="notes" @delNote="delNote"/>
+    <Modal @addNote="addNote" :currentId="currentId" v-show="modalOpen" @closeModal="closeModal"/>
     <AddButton @openModal="openModal"/>
   </div>
 </template>
@@ -41,7 +41,8 @@
             desc: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor'
           },
         ],
-        modalOpen: false
+        modalOpen: false,
+        currentId: 1
       }
     },
     methods: {
@@ -50,7 +51,34 @@
       },
       closeModal(){
         this.modalOpen = false
+      },
+      addNote(item){
+        this.notes.push(item)
+        console.log(item);
+      },
+      delNote(id){
+        let index = this.notes.findIndex( elem => elem.id == id )
+        this.notes.splice(index, 1)
+      },
+      getNotes(){
+        let localNotes = localStorage.getItem('notes');
+        if (localNotes.length > 0) {
+          this.notes = JSON.parse(localNotes);
+          let last = this.notes.length - 1;
+          this.currentId = last >= 0 ? this.notes[last].id + 1 : 1;
+        }
       }
+    },
+    watch: {
+      notes: {
+        handler() {
+          localStorage.setItem('notes', JSON.stringify(this.notes))
+        },
+        deep: true
+      }
+    },
+    created(){
+      this.getNotes()
     }
   }
 </script>

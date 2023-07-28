@@ -2,7 +2,7 @@
     <div class="notes">
         <div class="container">
             <div class="notes__top">
-                <h2 class="notes__title">Все заметки</h2>
+                <h2 class="notes__title">{{ notes.length > 0 ? 'Все заметки' : 'Нет заметок' }}</h2>
                 <button class="notes__btn" @click="grid = !grid">
                     <img src="../assets/img/list.svg" alt="" v-if="grid">
                     <img src="../assets/img/grid.svg" alt="" v-else>
@@ -13,6 +13,7 @@
                 <NotesCard :grid="grid"
                 v-for="item in notes" :key="item.id"
                 :note="item"
+                @delNote="$emit('delNote', item.id)"
                 />
             </div>
         </div>

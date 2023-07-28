@@ -1,36 +1,75 @@
 <template>
+    <Transition name="modal">
     <div class="modal" @click="closeModal">
         <div class="modal__form" @click.stop="">
             <h3 class="modal__title">Добавить заметку</h3>
             <div class="modal__content">
                 <label>
                     <span>Title</span>
-                    <input type="text" placeholder="Title">
+                    <input v-model="title" type="text" placeholder="Title">
                 </label>
                 <label>
                     <span>Content</span>
-                    <textarea rows="1" placeholder="Content"></textarea>
+                    <textarea v-model="desc" rows="1" placeholder="Content"></textarea>
                 </label>
             </div>
             <div class="modal__controls">
                 <button @click="closeModal" class="modal__btn modal__btn_red">Отмена</button>
-                <button class="modal__btn">Добавить</button>
+                <button @click="addNote" class="modal__btn">Добавить</button>
             </div>
         </div>
     </div>
+    </Transition>
 </template>
 
 <script>
     export default {
+        props: {
+            currentId: Number
+        },
+        data(){
+            return {
+                title: '',
+                desc: '',
+                id: this.currentId
+            }
+        },
         methods: {
             closeModal(){
                 this.$emit('closeModal')
+            },
+            addNote(){
+                let title = this.title.trim();
+                let desc = this.desc.trim();
+                if (title.length > 0 && desc.length > 0) {
+                    const item = {
+                        id: this.id++, 
+                        title,
+                        date: new Date().toLocaleDateString(),
+                        desc
+                    }
+                    this.$emit('addNote', item);
+                    this.closeModal();
+                    this.title = '';
+                    this.desc = '';
+                }
             }
         }
     }
 </script>
 
 <style lang="scss">
+.modal-enter-active,
+.modal-leave-active {
+  transition: 0.5s ease;
+}
+
+.modal-enter-from,
+.modal-leave-to {
+  opacity: 0;
+  transform: scale(1.5);
+}
+
 .modal {
     background: rgba(0, 0, 0, 0.35);
     position: fixed;
