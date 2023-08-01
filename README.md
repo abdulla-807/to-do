@@ -1,4 +1,4 @@
-# project
+# Список заметок
 
 ## Project setup
 ```
