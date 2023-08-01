@@ -2,7 +2,7 @@
     <Transition name="modal">
     <div class="modal" @click="closeModal">
         <div class="modal__form" @click.stop="">
-            <h3 class="modal__title">Добавить заметку</h3>
+            <h3 class="modal__title">{{ edit ? words.titlewindowedit[lang] : words.titlewindow[lang] }}</h3>
             <div class="modal__content">
                 <label>
                     <span>Title</span>
@@ -14,8 +14,9 @@
                 </label>
             </div>
             <div class="modal__controls">
-                <button @click="closeModal" class="modal__btn modal__btn_red">Отмена</button>
-                <button @click="addNote" class="modal__btn">Добавить</button>
+                <button @click="closeModal" class="modal__btn modal__btn_red">{{ words.closebtn[lang] }}</button>
+                <button v-if="edit" @click="changeNote" class="modal__btn">{{ words.editwindowbtn[lang] }}</button>
+                <button v-else @click="addNote" class="modal__btn">{{ words.addbtn[lang] }}</button>
             </div>
         </div>
     </div>
@@ -25,7 +26,10 @@
 <script>
     export default {
         props: {
-            currentId: Number
+            currentId: Number,
+            edit: Boolean,
+            editNote: Object,
+            lang: String
         },
         data(){
             return {
@@ -53,8 +57,35 @@
                     this.title = '';
                     this.desc = '';
                 }
+            },
+            changeNote(){
+                let title = this.title.trim();
+                let desc = this.desc.trim();
+                if (title.length > 0 && desc.length > 0) {
+                    const item = {
+                        id: this.editNote.id, 
+                        title,
+                        date: new Date().toLocaleDateString(),
+                        desc
+                    }
+                    this.$emit('editedNote', item);
+                    this.closeModal();
+                    this.title = '';
+                    this.desc = '';
+                }
             }
-        }
+        },
+        watch:{
+            edit(val){
+                if(val){
+                    this.title = this.editNote.title;
+                    this.desc = this.editNote.desc;
+                } else {
+                    this.title = this.desc = ''
+                }
+            }
+        },
+        inject: ['words']
     }
 </script>
 

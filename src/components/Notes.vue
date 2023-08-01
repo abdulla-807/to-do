@@ -2,11 +2,11 @@
     <div class="notes">
         <div class="container">
             <div class="notes__top">
-                <h2 class="notes__title">{{ notes.length > 0 ? 'Все заметки' : 'Нет заметок' }}</h2>
+                <h2 class="notes__title">{{ notes.length > 0 ? words.infobar[lang] : words.noinfobar[lang] }}</h2>
                 <button class="notes__btn" @click="grid = !grid">
                     <img src="../assets/img/list.svg" alt="" v-if="grid">
                     <img src="../assets/img/grid.svg" alt="" v-else>
-                    <span>{{ grid ? 'Список' : 'Сетка'}}</span>
+                    <span>{{ grid ? words.list[lang] : words.grid[lang]}}</span>
                 </button>
             </div>
             <div class="notes__list" :class="{ active: !grid}">
@@ -14,6 +14,8 @@
                 v-for="item in notes" :key="item.id"
                 :note="item"
                 @delNote="$emit('delNote', item.id)"
+                @changeNote="$emit('changeNote', item.id)"
+                :lang="lang"
                 />
             </div>
         </div>
@@ -27,7 +29,8 @@
             notes: {
                 type: Array,
                 default: []
-            }
+            },
+            lang: String
         },
         components: {
             NotesCard
@@ -36,7 +39,8 @@
             return {
                 grid: true
             }
-        }
+        },
+        inject: ['words']
     }
 </script>
 

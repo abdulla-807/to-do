@@ -1,8 +1,25 @@
 <template>
   <div>
-    <Navbar></Navbar>
-    <Notes :notes="notes" @delNote="delNote"/>
-    <Modal @addNote="addNote" :currentId="currentId" v-show="modalOpen" @closeModal="closeModal"/>
+    <Navbar 
+    @getSearch="getSearch" 
+    :lang="lang" 
+    @changeLang="changeLang"
+    ></Navbar>
+    <!-- <Navbar @getSearch="search = $event"></Navbar> -->
+    <Notes :notes="filterNotes" 
+    @delNote="delNote"
+    @changeNote="changeNote"
+    :lang="lang"
+    />
+    <Modal @addNote="addNote" 
+    :currentId="currentId" 
+    v-show="modalOpen" 
+    @closeModal="closeModal"
+    :edit="edit"
+    :editNote="editNote"
+    @editedNote="editedNote"
+    :lang="lang"
+    />
     <AddButton @openModal="openModal"/>
   </div>
 </template>
@@ -12,6 +29,10 @@
   import Notes from '@/components/Notes.vue';
   import Modal from '@/components/Modal.vue';
   import AddButton from '@/components/Add-Button.vue';
+  import langs from './lang';
+  // import { vasya, petya } from "./lang";
+  // console.log(langs);
+  // console.log(vasya, petya);
   export default {
     components: {
       Navbar,
@@ -42,7 +63,12 @@
           },
         ],
         modalOpen: false,
-        currentId: 1
+        currentId: 1,
+        edit: false,
+        editNote: {},
+        search: '',
+        lang: 'ru',
+        langWords: {}
       }
     },
     methods: {
@@ -51,6 +77,10 @@
       },
       closeModal(){
         this.modalOpen = false
+        setTimeout(() => {
+          this.edit = false
+        }, 500);
+        
       },
       addNote(item){
         this.notes.push(item)
@@ -67,6 +97,27 @@
           let last = this.notes.length - 1;
           this.currentId = last >= 0 ? this.notes[last].id + 1 : 1;
         }
+      },
+      changeNote(id){
+        let value = this.notes.find((elem)=> elem.id == id);
+        this.edit = this.modalOpen = true;
+        this.editNote = value;
+      },
+      editedNote(obj){
+        this.notes.forEach((elem)=>{
+          if (elem.id == obj.id) {
+            elem.title = obj.title;
+            elem.desc = obj.desc;
+            elem.date = obj.date
+          }
+        })
+      },
+      getSearch(val){
+        this.search = val;
+      },
+      changeLang(val){
+        this.lang = val;
+        localStorage.setItem('lang', val);
       }
     },
     watch: {
@@ -77,8 +128,22 @@
         deep: true
       }
     },
+    computed:{
+      filterNotes(){
+        const list = this.notes.filter((elem)=>{
+          let result = elem.title.toLowerCase().includes(this.search.toLowerCase());
+          return result;
+        })
+        return list;
+      }
+    },
     created(){
-      this.getNotes()
+      this.getNotes();
+      this.langWords = langs;
+      this.lang = localStorage.getItem('lang') || 'ru'
+    },
+    provide: {
+      words: langs
     }
   }
 </script>

@@ -2,8 +2,9 @@
     <header class="header">
         <Transition name="header">
             <div class="header__content" v-show="header == true">
-                <button class="header__lang">ru</button>
-                <h1 class="header__title">Заметки</h1>
+                <button @click="changeLang" class="header__lang" v-if="lang == 'ru'">uz</button>
+                <button @click="changeLang" class="header__lang" v-else>ru</button>
+                <h1 class="header__title">{{ words.appbartitle[lang] }}</h1>
                 <button class="header__search" @click="header = false">
                     <img src="@/assets/img/search.svg" alt="">
                 </button>
@@ -14,7 +15,7 @@
             <button class="header__back" @click="header=true">
                 <img src="@/assets/img/back.svg" alt="">
             </button>
-            <input v-model="search" type="text" class="header__input container" placeholder="Поиск...">
+            <input v-model="search" type="text" class="header__input container" :placeholder="words.appbarseacrch[lang]">
             <button class="header__clear" @click="search=''">
                 <img src="../assets/img/close.svg" alt="">
             </button>
@@ -24,13 +25,30 @@
 </template>
 
 <script>
+import lang from '@/lang';
+
 export default {
+    props: {
+        lang: String
+    },
     data(){
         return {
             header: true,
             search: ''
         }
-    }
+    },
+    watch: {
+        search(val){
+            this.$emit('getSearch', val)
+        }
+    },
+    methods: {
+        changeLang(){
+            let val = this.lang == 'ru' ? 'uz' : 'ru';
+            this.$emit('changeLang', val)
+        }
+    },
+    inject: ['words']
 }
 </script>
 
